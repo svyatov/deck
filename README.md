@@ -1,6 +1,6 @@
 # Deck
 
-[![Build Status](https://travis-ci.org/svyatov/deck?branch=master)](https://travis-ci.org/svyatov/deck)
+[![Build Status](https://travis-ci.org/svyatov/deck.svg?branch=master)](https://travis-ci.org/svyatov/deck)
 [![Hex.pm](https://img.shields.io/hexpm/v/deck.svg)](https://hex.pm/packages/deck)
 [![Hex.pm](https://img.shields.io/hexpm/dt/deck.svg)](https://hex.pm/packages/deck)
 
