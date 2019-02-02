@@ -27,6 +27,6 @@ Pull Requests are happily accepted.
 
 ## Copyright and License
 
-Copyright (c) 2018, Leonid Svyatov.
+Copyright (c) 2019, Leonid Svyatov.
 
 Deck source code is licensed under the [Apache License v2.0](LICENSE).
