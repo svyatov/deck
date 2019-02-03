@@ -81,7 +81,7 @@ defmodule Deck do
       true
   """
   def shuffled(n_cards) when is_valid_number_of_cards(n_cards) do
-    new(n_cards) |> shuffle
+    n_cards |> new |> shuffle
   end
 
   @doc """
@@ -95,7 +95,7 @@ defmodule Deck do
       true
   """
   def shuffled_low(n_cards) when is_valid_number_of_cards(n_cards) do
-    new_low(n_cards) |> shuffle
+    n_cards |> new_low |> shuffle
   end
 
   @doc """

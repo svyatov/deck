@@ -22,15 +22,17 @@ defmodule Deck.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
-      {:benchee, "~> 0.13", only: :dev}
+      {:benchee, "~> 0.13", only: :dev},
+      {:inch_ex, "~> 2.0", only: :docs},
+      {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false}
     ]
   end
 
-  defp description() do
+  defp description do
     "Get, shuffle and deal a deck of playing cards of any size (from 4 to 52 cards)."
   end
 
-  defp package() do
+  defp package do
     [
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => "https://github.com/svyatov/deck"}

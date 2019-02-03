@@ -26,3 +26,7 @@ matrix:
       otp_release: 19.3
     - elixir: 1.8
       otp_release: 20.3
+
+after_script:
+  - MIX_ENV=docs mix deps.get
+  - MIX_ENV=docs mix inch.report
