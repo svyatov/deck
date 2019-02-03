@@ -1,7 +1,8 @@
 # Deck
 
-[![Build Status](https://travis-ci.org/svyatov/deck.svg?branch=master)](https://travis-ci.org/svyatov/deck)
 [![Hex.pm](https://img.shields.io/hexpm/v/deck.svg)](https://hex.pm/packages/deck)
+[![Build Status](https://travis-ci.org/svyatov/deck.svg?branch=master)](https://travis-ci.org/svyatov/deck)
+[![Inline docs](https://inch-ci.org/github/svyatov/deck.svg?branch=master)](https://inch-ci.org/github/svyatov/deck)
 [![Hex.pm](https://img.shields.io/hexpm/dt/deck.svg)](https://hex.pm/packages/deck)
 
 Get, shuffle and deal a deck of playing cards of any size (from 4 to 52 cards).
