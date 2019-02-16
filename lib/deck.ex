@@ -33,7 +33,7 @@ defmodule Deck do
   @doc """
   Returns a deck containing high `n_cards` ordered by rank.
 
-  `n_cards` must be less than or equal 52 and must be dividable by 4.
+  `n_cards` must be less than or equal 52 and must be divisible by 4.
 
   ## Examples
 
@@ -47,7 +47,7 @@ defmodule Deck do
   @doc """
   Returns a deck containing low `n_cards` ordered by rank.
 
-  `n_cards` must be less than or equal 52 and must be dividable by 4.
+  `n_cards` must be less than or equal 52 and must be divisible by 4.
 
   ## Examples
 
@@ -73,7 +73,7 @@ defmodule Deck do
   @doc """
   Returns a shuffled deck containing high `n_cards`.
 
-  `n_cards` must be less than or equal 52 and must be dividable by 4.
+  `n_cards` must be less than or equal 52 and must be divisible by 4.
 
   ## Examples
 
@@ -87,7 +87,7 @@ defmodule Deck do
   @doc """
   Returns a shuffled deck containing low `n_cards`.
 
-  `n_cards` must be less than or equal 52 and must be dividable by 4.
+  `n_cards` must be less than or equal 52 and must be divisible by 4.
 
   ## Examples
 
