@@ -23,7 +23,7 @@ defmodule Deck.MixProject do
     [
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:benchee, "~> 0.13", only: :dev},
-      {:credo, github: "rrrene/credo", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 
