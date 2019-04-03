@@ -22,7 +22,7 @@ defmodule Deck.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
-      {:benchee, "~> 0.13", only: :dev},
+      {:benchee, "~> 1.0", only: :dev},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
