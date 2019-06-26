@@ -152,6 +152,18 @@ defmodule Deck do
   end
 
   @doc """
+  "Burns" specified cards in the `deck` and returns the rest of the `deck`.
+
+  ## Example
+
+      iex> Deck.burn(Deck.new(8), ["Ah", "As", "Kd"])
+      ["Kc", "Kh", "Ks", "Ac", "Ad"]
+  """
+  def burn(deck, cards) when is_list(deck) and is_list(cards) do
+    deck |> Enum.reject(&Enum.member?(cards, &1))
+  end
+
+  @doc """
   Returns number of cards left in the `deck`.
 
   ## Example
