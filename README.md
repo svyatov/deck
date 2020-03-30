@@ -9,9 +9,9 @@ Get, shuffle and deal a deck of playing cards of any size (from 4 to 52 cards).
 ## Installation
 
 ```elixir
-def deps do
+defp deps do
   [
-    {:deck, "~> 1.0"}
+    {:deck, "~> 1.1"}
   ]
 end
 ```
@@ -24,9 +24,8 @@ Documentation can be found at [hexdocs.pm/deck](https://hexdocs.pm/deck).
 
 Pull Requests are happily accepted.
 
-
 ## Copyright and License
 
-Copyright (c) 2019, Leonid Svyatov.
+Copyright (c) 2019-2020, Leonid Svyatov.
 
 Deck source code is licensed under the [Apache License v2.0](LICENSE).
