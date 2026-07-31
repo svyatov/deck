@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in the library behaves differently from what it documents.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report a security vulnerability here. Follow
+        [SECURITY.md](https://github.com/svyatov/deck/security/policy) instead.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: The call you made and what came back.
+      placeholder: |
+        Deck.new(38) returned a deck instead of raising.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+      description: Quote the documentation or the README line it disagrees with, where there is one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce it
+      description: The shortest sequence that shows it. An iex session is fine.
+      render: elixir
+    validations:
+      required: true
+
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `elixir --version`, plus the deck version from your mix.lock.
+      placeholder: Elixir 1.20.2, Erlang/OTP 29, deck 1.1.0
+    validations:
+      required: true
