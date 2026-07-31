@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog 2.0.0](https://keepachangelog.com/en/2.
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-31
+
 ### Added
 
 - Continuous integration on GitHub Actions, covering Elixir 1.16 through 1.20, each on an OTP release that version supports. The project had no working CI after travis-ci.org shut down.
@@ -37,6 +39,7 @@ The format is based on [Keep a Changelog 2.0.0](https://keepachangelog.com/en/2.
 
 - First release. Build a full or partial deck, shuffle it, deal from it, burn cards, and count what is left.
 
-[Unreleased]: https://github.com/svyatov/deck/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/svyatov/deck/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/svyatov/deck/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/svyatov/deck/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/svyatov/deck/releases/tag/v1.0.0
