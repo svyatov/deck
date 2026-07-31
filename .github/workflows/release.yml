@@ -1,0 +1,124 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  # No credential exists in this job. It proves the tag agrees with mix.exs, the
+  # tests pass, and the package builds, before anything can reach Hex.
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124  # v1.24.1
+        with:
+          otp-version: "29"
+          elixir-version: "1.20"
+
+      - name: Tag must match the version in mix.exs
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          mix_version="$(mix run --no-start --no-compile --no-deps-check \
+            -e 'IO.puts(Mix.Project.config()[:version])' | tail -1)"
+          if [ "$tag_version" != "$mix_version" ]; then
+            echo "tag ${GITHUB_REF_NAME} carries version ${tag_version}," \
+                 "mix.exs declares ${mix_version}" >&2
+            exit 1
+          fi
+
+      - run: mix deps.get --check-locked
+      - run: mix test
+
+      # MIX_ENV=prod because every dependency this project has is only: :dev or
+      # only: [:dev, :test], so the package builds with nothing installed. That
+      # is what lets the publish job below hold the credential without also
+      # holding a dependency tree.
+      - run: MIX_ENV=prod mix hex.build
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # A human clears this before the credential is handed out. Note that
+    # GitHub's "prevent self-review" is a separate opt-in setting, so by default
+    # the person who pushed the tag can approve their own release. On a
+    # one-maintainer project the gate is a deliberate pause, not a second pair
+    # of eyes.
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124  # v1.24.1
+        with:
+          otp-version: "29"
+          elixir-version: "1.20"
+
+      # Build, attest, and publish in one job, which is not the split the other
+      # registries get. mix hex.publish builds the tarball in memory and uploads
+      # it; it accepts no prebuilt .tar path. So a tarball attested in another
+      # job would be a different build from the one that ships, and the file
+      # ordering inside a Hex tarball follows directory traversal rather than a
+      # canonical sort, so two builds are byte-identical only when they run the
+      # same way on the same filesystem. Same job is what makes that true.
+      #
+      # Nothing is installed here beyond the hex archive setup-beam brings.
+      - name: Build the package tarball
+        id: build
+        run: |
+          MIX_ENV=prod mix hex.build
+          tarball="deck-${GITHUB_REF_NAME#v}.tar"
+          test -f "$tarball"
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+          echo "digest=$(sha256sum "$tarball" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373  # v4.1.1
+        with:
+          subject-path: ${{ steps.build.outputs.tarball }}
+
+      # `package` is load-bearing. Bare `mix hex.publish` also builds and
+      # publishes documentation, which it does by running mix docs, so it would
+      # install ex_doc and execute project code in the job holding the
+      # credential. Documentation is not published from here at all.
+      - name: Publish to Hex
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: MIX_ENV=prod mix hex.publish package --yes
+
+      # Hex serves no provenance of its own, so the forge attestation above is
+      # the only link between this workflow and the published artifact. That
+      # link holds only if the bytes Hex recorded are the bytes we attested.
+      # Hex publishes the release's checksum in its API, and it is the SHA-256
+      # of the tarball it serves, so this compares the two and fails the release
+      # if they disagree.
+      - name: Attested digest must match what Hex recorded
+        env:
+          BUILT_DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          hex_checksum=""
+          # The release takes a moment to become readable through the API.
+          for attempt in 1 2 3 4 5; do
+            hex_checksum="$(curl -fsS \
+              "https://hex.pm/api/packages/deck/releases/${version}" \
+              | python3 -c 'import sys,json;print(json.load(sys.stdin).get("checksum",""))')"
+            if [ -n "$hex_checksum" ]; then
+              echo "read the release on attempt ${attempt}"
+              break
+            fi
+            sleep 10
+          done
+          echo "attested: ${BUILT_DIGEST}"
+          echo "hex.pm:   ${hex_checksum}"
+          if [ "$BUILT_DIGEST" != "$hex_checksum" ]; then
+            echo "Hex is serving bytes this run did not attest." >&2
+            echo "The release is live; the attestation does not cover it." >&2
+            exit 1
+          fi
