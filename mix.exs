@@ -21,7 +21,7 @@ defmodule Deck.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.40", only: :dev, runtime: false},
       {:benchee, "~> 1.0", only: :dev},
       {:credo, "~> 1.3", only: [:dev, :test], runtime: false}
     ]
@@ -33,8 +33,11 @@ defmodule Deck.MixProject do
 
   defp package do
     [
-      licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/svyatov/deck"}
+      licenses: ["Apache-2.0"],
+      links: %{
+        "GitHub" => "https://github.com/svyatov/deck",
+        "Changelog" => "https://github.com/svyatov/deck/blob/master/CHANGELOG.md"
+      }
     ]
   end
 end
