@@ -1,0 +1,8 @@
+# Blank issues stay on. The README points questions at this tracker, and the two
+# forms below only cover defects and proposals, so turning it off would leave a
+# question with nowhere to go.
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/svyatov/deck/security/policy
+    about: Follow SECURITY.md. Do not open a public issue for a vulnerability.

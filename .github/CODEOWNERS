@@ -1,0 +1,6 @@
+# Default owner for every path in this repository.
+#
+# R-COM-06 does not reach a repository where one principal holds every merge
+# path, which is the case here. This file costs nothing and becomes live the
+# day a second person is granted write access.
+* @svyatov

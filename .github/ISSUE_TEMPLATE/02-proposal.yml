@@ -1,0 +1,45 @@
+name: Change proposal
+description: Propose a change to what the library does or how it behaves.
+labels: ["proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Deck is deliberately small and has no feature roadmap. A proposal is
+        most likely to land when it makes an existing function do the right
+        thing, rather than adding a new one.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you were trying to do, and where the library got in the way.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+      description: The change itself. Name the functions it touches.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you do today instead
+      description: The workaround you already have. If there is none, say so.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Does this change existing behavior?
+      options:
+        - "No, it is additive"
+        - "Yes, callers would have to change"
+        - "I am not sure"
+    validations:
+      required: true

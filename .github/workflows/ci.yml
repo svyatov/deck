@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: elixir ${{ matrix.elixir }} / otp ${{ matrix.otp }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      # Explicit pairs rather than a cross product: Elixir supports a moving
+      # window of OTP releases, so most cells of a full product do not exist.
+      matrix:
+        include:
+          - elixir: "1.16"
+            otp: "26"
+          - elixir: "1.17"
+            otp: "27"
+          - elixir: "1.18"
+            otp: "28"
+          - elixir: "1.19"
+            otp: "28"
+          - elixir: "1.20"
+            otp: "29"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124  # v1.24.1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+      # --check-locked is what makes a stale mix.lock fail here instead of
+      # being silently re-resolved into something nobody reviewed.
+      - run: mix deps.get --check-locked
+      - run: mix compile --warnings-as-errors
+      - run: mix test
+
+  lint:
+    name: format and credo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124  # v1.24.1
+        with:
+          otp-version: "29"
+          elixir-version: "1.20"
+      - run: mix deps.get --check-locked
+      - run: mix format --check-formatted
+      - run: mix credo

@@ -1,0 +1,130 @@
+name: osv-scanner
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: "30 12 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Both jobs run google/osv-scanner-action's two actions directly rather than
+# calling its reusable workflows. A job that calls a reusable workflow cannot
+# set timeout-minutes, and the upstream workflows set none, so either job could
+# hold a runner until GitHub's six-hour default. The steps below are what those
+# workflows run, minus the artifact uploads, against the same pinned v2.3.8.
+jobs:
+  # Scoped to what the change introduces, so it can block the merge. A scan of
+  # the whole repository would fail on an advisory published outside the change,
+  # which no contributor can resolve. The pair of scans below is what makes that
+  # scoping work: the reporter fails only on a vulnerability the target branch
+  # did not already have.
+  #
+  # Nothing is uploaded to code scanning here, because a pull request from a
+  # fork gets a read-only token whatever this job grants. The findings arrive as
+  # annotations on the diff, and the rest of the job's value is the pass or
+  # fail; the scheduled run below is what populates code scanning.
+  pull-request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Full history, because the scan below checks out the target branch.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check out the target branch
+        run: git checkout "$GITHUB_BASE_REF"
+
+      # osv-scanner exits non-zero on any finding, which is not yet an answer
+      # here. The reporter step decides, once it has both scans to compare.
+      - name: Scan the target branch
+        uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        continue-on-error: true
+        with:
+          scan-args: |-
+            --format=json
+            --output=old-results.json
+            --recursive
+            ./
+
+      # -f in case the scanner left anything behind. It should not have.
+      - name: Check out the pull request
+        run: git checkout -f "$GITHUB_SHA"
+
+      - name: Scan the pull request
+        uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        continue-on-error: true
+        with:
+          scan-args: |-
+            --format=json
+            --output=new-results.json
+            --recursive
+            ./
+
+      # The SARIF file goes nowhere, since nothing uploads it, but --output is
+      # where the reporter writes its report, and writing it is what produces
+      # the annotations and the exit status.
+      - name: Report what the pull request adds
+        uses: google/osv-scanner-action/osv-reporter-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        with:
+          scan-args: |-
+            --output=results.sarif
+            --old=old-results.json
+            --new=new-results.json
+            --gh-annotations=true
+            --fail-on-vuln=true
+
+  # Reports the whole repository and never gates a merge. This is the only thing
+  # watching mix.lock against an advisory feed: Dependabot ships no security
+  # updates for mix, and the dependency graph does not parse Elixir.
+  #
+  # Runs on the weekly schedule and on a push to master, so code scanning gets
+  # repopulated when a change lands rather than waiting until the next Monday.
+  repository:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Scan the repository
+        uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        continue-on-error: true
+        with:
+          scan-args: |-
+            --format=json
+            --output=results.json
+            --recursive
+            ./
+
+      - name: Convert the results to SARIF
+        uses: google/osv-scanner-action/osv-reporter-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        with:
+          scan-args: |-
+            --output=results.sarif
+            --new=results.json
+            --gh-annotations=false
+            --fail-on-vuln=true
+
+      # The step above fails the job on a finding, which is the signal this run
+      # exists to send. The upload still has to happen, or the finding never
+      # reaches the security tab.
+      - name: Upload to code scanning
+        if: ${{ !cancelled() }}
+        uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38  # v4.37.4
+        with:
+          sarif_file: results.sarif
