@@ -2,18 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
-The format is based on [Keep a Changelog 2.0.0](https://keepachangelog.com/en/2.0.0/), and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) over the public API described in the [README](README.md#what-it-covers).
+The format is based on [Keep a Changelog 2.0.0](https://keepachangelog.com/en/2.0.0/), and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) over the public API described in the [README](README.md#public-api).
 
 ## [Unreleased]
 
 ### Added
 
-- Continuous integration on GitHub Actions, covering Elixir 1.18, 1.19, and 1.20 on OTP 28 and 29. The project had no working CI after travis-ci.org shut down.
+- Continuous integration on GitHub Actions, covering Elixir 1.16 through 1.20, each on an OTP release that version supports. The project had no working CI after travis-ci.org shut down.
 - The community files a contributor needs: a contributing guide carrying the setup and check commands, a code of conduct, a security policy with a private reporting channel, issue forms, and a pull request template.
 
 ### Changed
 
 - The README states what the library covers, which Elixir versions are tested, whether it is maintained, and where to ask a question. The dead Travis badge and the downloads badge are gone.
+- The README declares the public API that Semantic Versioning covers: the `Deck` module, the card format, and the accepted deck size. `Deck.Guards` is named as internal, which its `@moduledoc false` already made it.
 - `mix.exs` declares the license as the SPDX identifier `Apache-2.0` rather than the free text `Apache 2.0`, and links the changelog alongside the repository.
 
 ### Removed

@@ -7,10 +7,8 @@ Deck builds, shuffles, and deals a deck of playing cards, for anyone writing a c
 
 Most card libraries hand you 52 cards and stop. Deck takes any size from 4 to 52
 that divides by 4, so a 36-card short deck or a 32-card pack is an argument
-rather than a workaround, and `Deck.Guards` rejects every other size at the
-function head instead of returning a deck nobody asked for. It has no run-time
-dependencies: `mix.exs` declares three, and every one of them is `only: :dev` or
-`only: [:dev, :test]`.
+rather than a workaround. It has no run-time dependencies: `mix.exs` declares
+three, and every one of them is `only: :dev` or `only: [:dev, :test]`.
 
 ## Installation
 
@@ -29,6 +27,9 @@ Then fetch it:
 ```bash
 mix deps.get
 ```
+
+The package is published to [Hex](https://hex.pm/packages/deck), and the
+generated API documentation is at [hexdocs.pm/deck](https://hexdocs.pm/deck).
 
 ## Example
 
@@ -54,15 +55,33 @@ followed by a suit from `c d h s`. `Deck.new/1` counts down from the ace, so
 the two. `Deck.shuffled/1` and `Deck.shuffle/1` return the same cards in an
 order that changes per call, using the modern Fisher-Yates shuffle.
 
-## What it covers
+## Public API
+
+Semantic Versioning covers the `Deck` module:
+
+- `Deck.new/0`, `Deck.new/1`, and `Deck.new_low/1` build a deck in rank order.
+- `Deck.shuffled/0`, `Deck.shuffled/1`, and `Deck.shuffled_low/1` build one and
+  shuffle it.
+- `Deck.shuffle/1` shuffles the deck it is given.
+- `Deck.deal/2` returns cards off the top and the rest of the deck.
+- `Deck.burn/2` drops cards off the top and returns the rest.
+- `Deck.size/1` counts the cards left.
+
+The card format is part of that contract: a two-character string, rank then
+suit, from the sets listed above. So is the argument every sized function takes,
+an integer divisible by 4 and no greater than 52, and the `FunctionClauseError`
+raised for anything else.
+
+Three things stay outside it. `Deck.Guards` is internal, carries
+`@moduledoc false`, and can change in any release. The order a shuffle returns
+is random per call. The text of an error message is not an interface.
+
+## Elixir versions
 
 Deck is plain Elixir with no version-dependent code of its own. `mix.exs`
-declares `elixir: "~> 1.6"`, and CI exercises Elixir 1.18, 1.19, and 1.20 on
-OTP 28 and 29. Nothing below 1.18 is tested: the declared floor records that the
-library asks for nothing newer, not that anyone still checks it there.
-
-The package is published to [Hex](https://hex.pm/packages/deck), and the
-generated API documentation is at [hexdocs.pm/deck](https://hexdocs.pm/deck).
+declares `elixir: "~> 1.6"`, and CI exercises Elixir 1.16 through 1.20, each on
+an OTP release that version supports. The floor below 1.16 records that the
+library asks for nothing newer, not that anyone checks it there.
 
 ## Status
 
