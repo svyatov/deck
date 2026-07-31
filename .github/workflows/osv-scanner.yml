@@ -40,7 +40,10 @@ jobs:
   # Reports the whole repository and never gates a merge. This is the only thing
   # watching mix.lock against an advisory feed: Dependabot ships no security
   # updates for mix, and the dependency graph does not parse Elixir.
-  scheduled:
+  #
+  # Runs on the weekly schedule and on a push to master, so code scanning gets
+  # repopulated when a change lands rather than waiting until the next Monday.
+  repository:
     if: github.event_name != 'pull_request'
     permissions:
       actions: read
