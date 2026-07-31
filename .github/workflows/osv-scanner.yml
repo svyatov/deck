@@ -1,0 +1,49 @@
+name: osv-scanner
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: "30 12 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Scoped to what the change introduces, so it can block the merge. A scan of
+  # the whole repository would fail on an advisory published outside the change,
+  # which no contributor can resolve.
+  #
+  # upload-sarif is off because a pull request from a fork gets a read-only
+  # token whatever this block grants, and the upstream upload step carries no
+  # fork guard, so uploading would fail the job for every outside contributor.
+  # The job's value is the pass or fail; the scheduled run below is what
+  # populates code scanning.
+  #
+  # security-events: write stays even so. The called workflow declares it at its
+  # own top level, and granting less fails the run before any job starts.
+  pull-request:
+    if: github.event_name == 'pull_request'
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+    with:
+      upload-sarif: false
+
+  # Reports the whole repository and never gates a merge. This is the only thing
+  # watching mix.lock against an advisory feed: Dependabot ships no security
+  # updates for mix, and the dependency graph does not parse Elixir.
+  scheduled:
+    if: github.event_name != 'pull_request'
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
