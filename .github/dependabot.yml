@@ -1,18 +1,31 @@
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-
-  # This entry is the only thing moving mix.lock forward, and it is not a
-  # vulnerability watcher. Dependabot lists mix for version updates and not for
-  # security updates, and GitHub's dependency graph parses no Elixir manifest at
-  # all, so nothing on the forge reads mix.lock against an advisory feed. The
-  # osv-scanner workflow is what covers that; without it an advisory against a
-  # locked dependency reaches nobody. That is how earmark 1.4.3 sat here retired
-  # and carrying a CVE from 2026 until somebody ran a scanner by hand.
+  # This entry is the only thing moving mix.lock forward, and it is not a vulnerability
+  # watcher. Dependabot lists mix for version updates and not for security updates, and
+  # GitHub's dependency graph parses no Elixir manifest at all, so nothing on the forge reads
+  # mix.lock against an advisory feed. The osv-scanner workflow is what covers that; without
+  # it an advisory against a locked dependency reaches nobody. That is how earmark 1.4.3 sat
+  # here retired and carrying a CVE from 2026 until somebody ran a scanner by hand.
   - package-ecosystem: "mix"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: weekly
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
+    groups:
+      mix:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
