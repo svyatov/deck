@@ -46,7 +46,7 @@ jobs:
       # osv-scanner exits non-zero on any finding, which is not yet an answer
       # here. The reporter step decides, once it has both scans to compare.
       - name: Scan the target branch
-        uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1  # v2.5.0
         continue-on-error: true
         with:
           scan-args: |-
@@ -60,7 +60,7 @@ jobs:
         run: git checkout -f "$GITHUB_SHA"
 
       - name: Scan the pull request
-        uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1  # v2.5.0
         continue-on-error: true
         with:
           scan-args: |-
@@ -73,7 +73,7 @@ jobs:
       # where the reporter writes its report, and writing it is what produces
       # the annotations and the exit status.
       - name: Report what the pull request adds
-        uses: google/osv-scanner-action/osv-reporter-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        uses: google/osv-scanner-action/osv-reporter-action@8deb546fdb875b9996d27d4950be7312dac076a1  # v2.5.0
         with:
           scan-args: |-
             --output=results.sarif
@@ -102,7 +102,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan the repository
-        uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1  # v2.5.0
         continue-on-error: true
         with:
           scan-args: |-
@@ -112,7 +112,7 @@ jobs:
             ./
 
       - name: Convert the results to SARIF
-        uses: google/osv-scanner-action/osv-reporter-action@9a498708959aeaef5ef730655706c5a1df1edbc2  # v2.3.8
+        uses: google/osv-scanner-action/osv-reporter-action@8deb546fdb875b9996d27d4950be7312dac076a1  # v2.5.0
         with:
           scan-args: |-
             --output=results.sarif
@@ -125,6 +125,6 @@ jobs:
       # reaches the security tab.
       - name: Upload to code scanning
         if: ${{ !cancelled() }}
-        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3  # v4.37.6
+        uses: github/codeql-action/upload-sarif@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd  # v4.37.7
         with:
           sarif_file: results.sarif
